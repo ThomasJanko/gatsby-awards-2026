@@ -69,6 +69,52 @@ src/
   socket.ts, ui.tsx    socket typé, hooks, composants
 ```
 
-## Héberger en ligne (optionnel)
+## Déployer sur un serveur (Docker + Nginx Proxy Manager)
 
-C'est un seul process Node avec WebSocket : Railway, Render ou Fly.io conviennent (`npm run build` puis `npm start`). Vercel ne convient pas pour le serveur WebSocket.
+Une fois en ligne sur un domaine, les invités peuvent rejoindre **en 4G comme en Wi-Fi** : plus besoin d'être sur le même réseau. Les QR codes utilisent automatiquement le domaine.
+
+### 1. Sur le serveur Ubuntu
+
+```bash
+# Récupérer le projet (git clone, scp, rsync…)
+cd ~/apps/awards-2026
+
+# Trouver le réseau Docker de Nginx Proxy Manager
+docker network ls                                   # ex. npm_default, nginx-proxy-manager_default…
+docker inspect <conteneur-npm> --format '{{json .NetworkSettings.Networks}}'
+
+cp .env.example .env                                # puis mets le bon PROXY_NETWORK
+docker compose up -d --build
+docker compose ps                                   # doit passer "healthy" après ~10 s
+docker compose logs -f
+```
+
+### 2. Dans Nginx Proxy Manager → Proxy Hosts → Add
+
+| Champ | Valeur |
+|---|---|
+| Domain Names | `awards.ton-domaine.fr` |
+| Scheme | `http` |
+| Forward Hostname / IP | `gatsby-awards` (nom du conteneur) |
+| Forward Port | `3000` |
+| **Websockets Support** | ✅ **obligatoire** (sinon les votes ne passent pas en temps réel) |
+| Block Common Exploits | ✅ |
+| SSL | Request a new Let's Encrypt certificate, Force SSL, HTTP/2 |
+
+Pense à créer l'enregistrement DNS `A` (ou `CNAME`) du sous-domaine vers l'IP du serveur.
+
+> **NPM hors Docker, ou sur un autre réseau ?** Dans `docker-compose.yml`, commente le bloc `networks`, décommente `ports: "127.0.0.1:3000:3000"`, et forwarde vers `127.0.0.1:3000`. Si NPM est dans Docker mais pas sur un réseau partagé, utilise plutôt `ports: "3000:3000"` et l'IP LAN du serveur. Docker contourne `ufw` : ne laisse pas le port 3000 ouvert sur internet.
+
+### 3. Le soir J
+
+- TV : `https://awards.ton-domaine.fr/tv`
+- Ton téléphone : scanne le QR de la TV, puis « Créer la soirée ».
+
+### Mettre à jour / redémarrer
+
+```bash
+docker compose up -d --build     # après une modif du code
+docker compose restart           # ⚠ efface la soirée en cours (état en mémoire)
+```
+
+L'état est **en mémoire** : ne redémarre pas le conteneur pendant la soirée, et ne lance qu'**une seule instance** (pas de scaling).

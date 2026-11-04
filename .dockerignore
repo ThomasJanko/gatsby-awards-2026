@@ -1,0 +1,11 @@
+node_modules
+dist
+_to_delete
+.git
+.vscode
+.idea
+*.log
+*.zip
+.env
+Dockerfile
+docker-compose.yml

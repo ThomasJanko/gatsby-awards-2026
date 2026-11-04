@@ -1,0 +1,30 @@
+services:
+  awards:
+    build: .
+    image: gatsby-awards:latest
+    container_name: gatsby-awards
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      QUESTIONS_PER_GAME: ${QUESTIONS_PER_GAME:-15}
+      TZ: Europe/Paris
+    # Pas de port publié : Nginx Proxy Manager joint le conteneur par son nom
+    # sur le réseau Docker partagé ci-dessous (Forward Hostname : gatsby-awards, port 3000).
+    networks:
+      - proxy
+    # Si ton Nginx Proxy Manager n'est PAS dans Docker (ou pas sur le même réseau),
+    # commente le bloc "networks" et décommente ceci, puis forwarde vers 127.0.0.1:3000 :
+    ports:
+      - "3344:3000"
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+networks:
+  proxy:
+    external: true
+    # Nom du réseau Docker de Nginx Proxy Manager (voir `docker network ls`)
+    name: ${PROXY_NETWORK:-npm_default}
