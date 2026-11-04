@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Direction : carton d'invitation Art déco 1927 — bleu nuit, or champagne, Didone + capitales espacées */
+@theme {
+  --font-display: "Bodoni Moda Variable", "Didot", Georgia, serif;
+  --font-label: "Josefin Sans Variable", "Futura", system-ui, sans-serif;
+  --font-sans: "Josefin Sans Variable", "Futura", system-ui, sans-serif;
+
+  --color-night: #02041f;
+  --color-night-2: #070a33;
+  --color-night-3: #10154a;
+  --color-cream: #f3ead5;
+  --color-gold: #e3c573;
+  --color-gold-2: #f3dfa2;
+  --color-rose: #e0866e;
+
+  --animate-pop: pop 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  --animate-rise: rise 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  --animate-pulse-soft: pulse-soft 1.6s ease-in-out infinite;
+  --animate-drum: drum 0.18s ease-in-out infinite alternate;
+
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  @keyframes drum {
+    from { transform: rotate(-5deg) scale(1); }
+    to { transform: rotate(5deg) scale(1.06); }
+  }
+}
+
+html, body, #root { min-height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  background-color: var(--color-night);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 45%, #0a0f45 0%, transparent 70%),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Or métallique, légèrement animé */
+.gold-text {
+  background: linear-gradient(100deg, #b8913f 0%, #f3dfa2 30%, #e3c573 50%, #fff3cf 65%, #b8913f 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 220% center; }
+}
+
+/* Cartouche : double filet doré */
+.deco-card {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 55%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-gold) 22%, transparent);
+  outline-offset: 3px;
+}
+
+/* Boutons à pans coupés, comme les cartouches Art déco */
+.deco-btn {
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+}
+
+/* Motif de fond : fins rayons Art déco très discrets */
+.sky::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg at 50% 120%, rgba(227, 197, 115, 0.025) 0deg 2deg, transparent 2deg 9deg);
+}
